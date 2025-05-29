@@ -2,7 +2,7 @@
 # Verdicto
 
 Verdicto is an AI-powered litigation analytics platform that enables users to search and explore U.S. civil court data with GPT-generated case summaries, docket timelines, and legal analytics dashboards.
-
+<img width="1440" alt="Screen Shot 2025-05-29 at 3 43 31 PM" src="https://github.com/user-attachments/assets/c27f369b-d8d1-4b6f-8393-1fd803bc4186" />
 > 🚧 **This project is still a work in progress.** Expect ongoing updates and improvements.
 
 ---
@@ -71,6 +71,7 @@ Visit [http://localhost:3000](http://localhost:3000) to view the application.
 
 - 🔍 Full-text search across U.S. civil litigation cases
 - 🧠 GPT-generated case summaries and legal insight extraction
+
 - 📈 Dynamic docket timelines and data visualizations
 - 👤 User account system with saved case history
 - ⚙️ Automated case ingestion via scraping and cron jobs
