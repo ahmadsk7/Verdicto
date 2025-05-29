@@ -1,73 +1,76 @@
-# Welcome to your Lovable project
 
-## Project info
+# Verdicto
 
-**URL**: https://lovable.dev/projects/87f434fd-3241-49ff-a0ad-61d53af66b2f
+Verdicto is an AI-powered litigation analytics platform that enables users to search and explore U.S. civil court data with GPT-generated case summaries, docket timelines, and legal analytics dashboards.
 
-## How can I edit this code?
+> 🚧 **This project is still a work in progress.** Expect ongoing updates and improvements.
 
-There are several ways of editing your application.
+---
 
-**Use Lovable**
+## 🚀 Getting Started
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/87f434fd-3241-49ff-a0ad-61d53af66b2f) and start prompting.
+### Prerequisites
 
-Changes made via Lovable will be committed automatically to this repo.
+- Node.js and npm installed  
+  [Install Node.js with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
 
-**Use your preferred IDE**
+### Setup Instructions
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
-
-```sh
-# Step 1: Clone the repository using the project's Git URL.
+```bash
+# 1. Clone the repository
 git clone <YOUR_GIT_URL>
 
-# Step 2: Navigate to the project directory.
+# 2. Navigate to the project directory
 cd <YOUR_PROJECT_NAME>
 
-# Step 3: Install the necessary dependencies.
-npm i
+# 3. Install dependencies
+npm install
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+# 4. Start the development server
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+Visit [http://localhost:3000](http://localhost:3000) to view the application.
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+---
 
-**Use GitHub Codespaces**
+## 🧰 Tech Stack
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+- **Frontend:** React + TypeScript
+- **Build Tool:** Vite
+- **Styling:** Tailwind CSS
+- **UI Components:** shadcn/ui
+- **Charts:** Chart.js
+- **Backend:** FastAPI
+- **Database:** PostgreSQL
+- **Auth & Storage:** Supabase
+- **AI Integration:** OpenAI API
 
-## What technologies are used for this project?
+---
 
-This project is built with:
+## 📁 Project Structure
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+```bash
+/
+├── frontend/             # React + Vite frontend
+│   ├── components/
+│   ├── pages/
+│   ├── styles/
+│   └── ...
+├── backend/              # FastAPI backend
+│   ├── app/
+│   ├── routes/
+│   ├── models/
+│   └── ...
+└── README.md
+```
 
-## How can I deploy this project?
+---
 
-Simply open [Lovable](https://lovable.dev/projects/87f434fd-3241-49ff-a0ad-61d53af66b2f) and click on Share -> Publish.
+## 📊 Key Features
 
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+- 🔍 Full-text search across U.S. civil litigation cases
+- 🧠 GPT-generated case summaries and legal insight extraction
+- 📈 Dynamic docket timelines and data visualizations
+- 👤 User account system with saved case history
+- ⚙️ Automated case ingestion via scraping and cron jobs
