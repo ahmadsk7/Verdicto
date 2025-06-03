@@ -1,24 +1,48 @@
 import { useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useCaseStore } from "@/store/case";
+import { useDashboardStore } from "@/store/dashboard";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Loader2, Brain } from "lucide-react";
+import { ArrowLeft, Loader2, Brain, Bookmark, BookmarkCheck } from "lucide-react";
 import { format } from "date-fns";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { useToast } from "@/hooks/use-toast";
 
 const CaseDetail = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { toast } = useToast();
   const { currentCase, isLoading, error, fetchCase, generateAnalysis } = useCaseStore();
+  const { savedCases, addSavedCase, removeSavedCase } = useDashboardStore();
 
   useEffect(() => {
     if (id) {
       fetchCase(id);
     }
   }, [id]);
+
+  const isSaved = currentCase ? savedCases.some(c => c.id === currentCase.id) : false;
+
+  const handleSaveCase = () => {
+    if (!currentCase) return;
+
+    if (isSaved) {
+      removeSavedCase(currentCase.id);
+      toast({
+        title: "Case removed",
+        description: "The case has been removed from your saved cases.",
+      });
+    } else {
+      addSavedCase(currentCase);
+      toast({
+        title: "Case saved",
+        description: "The case has been added to your saved cases.",
+      });
+    }
+  };
 
   if (isLoading && !currentCase) {
     return (
@@ -44,14 +68,32 @@ const CaseDetail = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <Button
-          variant="ghost"
-          className="mb-6"
-          onClick={() => navigate(-1)}
-        >
-          <ArrowLeft className="h-4 w-4 mr-2" />
-          Back to Search
-        </Button>
+        <div className="flex items-center justify-between mb-6">
+          <Button
+            variant="ghost"
+            onClick={() => navigate(-1)}
+          >
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Back to Search
+          </Button>
+          <Button
+            variant={isSaved ? "default" : "outline"}
+            onClick={handleSaveCase}
+            className="gap-2"
+          >
+            {isSaved ? (
+              <>
+                <BookmarkCheck className="h-4 w-4" />
+                Saved
+              </>
+            ) : (
+              <>
+                <Bookmark className="h-4 w-4" />
+                Save Case
+              </>
+            )}
+          </Button>
+        </div>
 
         <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
           <h1 className="text-3xl font-bold text-gray-900 mb-4">
