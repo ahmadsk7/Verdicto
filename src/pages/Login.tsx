@@ -6,20 +6,43 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { useAuthStore } from "@/store/auth";
+import { z } from "zod";
+
+const loginSchema = z.object({
+  email: z.string().email("Invalid email address"),
+  password: z.string().min(1, "Password is required"),
+});
 
 const Login = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [form, setForm] = useState({ email: "", password: "" });
+  const [errors, setErrors] = useState<Partial<Record<keyof typeof form, string>>>({});
   const navigate = useNavigate();
   const { toast } = useToast();
   const { login, isLoading, error, clearError } = useAuthStore();
 
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setForm({ ...form, [e.target.id]: e.target.value });
+    setErrors({ ...errors, [e.target.id]: undefined });
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     clearError();
-    
+    setErrors({});
+
+    // Validate with zod
+    const result = loginSchema.safeParse(form);
+    let fieldErrors: typeof errors = {};
+    if (!result.success) {
+      for (const err of result.error.errors) {
+        fieldErrors[err.path[0] as keyof typeof form] = err.message;
+      }
+      setErrors(fieldErrors);
+      return;
+    }
+
     try {
-      await login(email, password);
+      await login(form.email, form.password);
       toast({
         title: "Login successful!",
         description: "Welcome back to Verdicto.",
@@ -60,11 +83,12 @@ const Login = () => {
                   id="email"
                   type="email"
                   required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  value={form.email}
+                  onChange={handleChange}
                   placeholder="Enter your email"
                   className="mt-1"
                 />
+                {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
               </div>
               
               <div>
@@ -73,11 +97,12 @@ const Login = () => {
                   id="password"
                   type="password"
                   required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  value={form.password}
+                  onChange={handleChange}
                   placeholder="Enter your password"
                   className="mt-1"
                 />
+                {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password}</p>}
               </div>
 
               <Button

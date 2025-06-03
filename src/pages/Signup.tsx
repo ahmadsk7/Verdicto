@@ -6,33 +6,57 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { useAuthStore } from "@/store/auth";
+import { z } from "zod";
+
+const signupSchema = z.object({
+  firstName: z.string().min(1, "First name is required"),
+  lastName: z.string().min(1, "Last name is required"),
+  email: z.string().email("Invalid email address"),
+  password: z.string().min(6, "Password must be at least 6 characters"),
+  confirmPassword: z.string().min(1, "Please confirm your password"),
+});
 
 const Signup = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
+  const [form, setForm] = useState({
+    email: "",
+    password: "",
+    confirmPassword: "",
+    firstName: "",
+    lastName: "",
+  });
+  const [errors, setErrors] = useState<Partial<Record<keyof typeof form, string>>>({});
   const navigate = useNavigate();
   const { toast } = useToast();
   const { signup, isLoading, error, clearError } = useAuthStore();
 
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setForm({ ...form, [e.target.id]: e.target.value });
+    setErrors({ ...errors, [e.target.id]: undefined });
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (password !== confirmPassword) {
-      toast({
-        title: "Passwords don't match",
-        description: "Please make sure your passwords match.",
-        variant: "destructive",
-      });
+    clearError();
+    setErrors({});
+
+    // Validate with zod
+    const result = signupSchema.safeParse(form);
+    let fieldErrors: typeof errors = {};
+    if (!result.success) {
+      for (const err of result.error.errors) {
+        fieldErrors[err.path[0] as keyof typeof form] = err.message;
+      }
+    }
+    if (form.password !== form.confirmPassword) {
+      fieldErrors.confirmPassword = "Passwords do not match";
+    }
+    if (Object.keys(fieldErrors).length > 0) {
+      setErrors(fieldErrors);
       return;
     }
 
-    clearError();
-    
     try {
-      await signup(email, password, firstName, lastName);
+      await signup(form.email, form.password, form.firstName, form.lastName);
       toast({
         title: "Account created successfully!",
         description: "Welcome to Verdicto. You can now start exploring cases.",
@@ -74,11 +98,12 @@ const Signup = () => {
                     id="firstName"
                     type="text"
                     required
-                    value={firstName}
-                    onChange={(e) => setFirstName(e.target.value)}
+                    value={form.firstName}
+                    onChange={handleChange}
                     placeholder="First name"
                     className="mt-1"
                   />
+                  {errors.firstName && <p className="text-red-500 text-xs mt-1">{errors.firstName}</p>}
                 </div>
                 <div>
                   <Label htmlFor="lastName">Last name</Label>
@@ -86,11 +111,12 @@ const Signup = () => {
                     id="lastName"
                     type="text"
                     required
-                    value={lastName}
-                    onChange={(e) => setLastName(e.target.value)}
+                    value={form.lastName}
+                    onChange={handleChange}
                     placeholder="Last name"
                     className="mt-1"
                   />
+                  {errors.lastName && <p className="text-red-500 text-xs mt-1">{errors.lastName}</p>}
                 </div>
               </div>
 
@@ -100,11 +126,12 @@ const Signup = () => {
                   id="email"
                   type="email"
                   required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  value={form.email}
+                  onChange={handleChange}
                   placeholder="Enter your email"
                   className="mt-1"
                 />
+                {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
               </div>
               
               <div>
@@ -113,11 +140,12 @@ const Signup = () => {
                   id="password"
                   type="password"
                   required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  value={form.password}
+                  onChange={handleChange}
                   placeholder="Create a password"
                   className="mt-1"
                 />
+                {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password}</p>}
               </div>
 
               <div>
@@ -126,11 +154,12 @@ const Signup = () => {
                   id="confirmPassword"
                   type="password"
                   required
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  value={form.confirmPassword}
+                  onChange={handleChange}
                   placeholder="Confirm your password"
                   className="mt-1"
                 />
+                {errors.confirmPassword && <p className="text-red-500 text-xs mt-1">{errors.confirmPassword}</p>}
               </div>
 
               <Button
