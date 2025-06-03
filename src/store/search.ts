@@ -3,41 +3,49 @@ import { persist } from 'zustand/middleware';
 
 export interface SearchFilters {
   dateRange: {
-    start: string | null;
-    end: string | null;
+    from: Date | null;
+    to: Date | null;
   };
   categories: string[];
   jurisdictions: string[];
+  courts: string[];
+  judges: string[];
+  status: 'all' | 'pending' | 'decided';
+  hasAnalysis: boolean | null;
 }
 
 export interface SearchHistoryItem {
   query: string;
   filters: SearchFilters;
-  timestamp: number;
+  timestamp: Date;
 }
 
 interface SearchState {
   query: string;
   filters: SearchFilters;
+  results: any[];
   history: SearchHistoryItem[];
   isLoading: boolean;
   error: string | null;
-  results: any[]; // TODO: Replace with proper type when we have the case interface
   setQuery: (query: string) => void;
   setFilters: (filters: Partial<SearchFilters>) => void;
   clearFilters: () => void;
-  addToHistory: (item: Omit<SearchHistoryItem, 'timestamp'>) => void;
+  addToHistory: (item: SearchHistoryItem) => void;
   clearHistory: () => void;
   search: () => Promise<void>;
 }
 
 const initialFilters: SearchFilters = {
   dateRange: {
-    start: null,
-    end: null,
+    from: null,
+    to: null,
   },
   categories: [],
   jurisdictions: [],
+  courts: [],
+  judges: [],
+  status: 'all',
+  hasAnalysis: null,
 };
 
 export const useSearchStore = create<SearchState>()(
@@ -45,42 +53,29 @@ export const useSearchStore = create<SearchState>()(
     (set, get) => ({
       query: '',
       filters: initialFilters,
+      results: [],
       history: [],
       isLoading: false,
       error: null,
-      results: [],
 
-      setQuery: (query: string) => {
-        set({ query });
-      },
+      setQuery: (query) => set({ query }),
 
-      setFilters: (newFilters: Partial<SearchFilters>) => {
+      setFilters: (newFilters) =>
         set((state) => ({
           filters: {
             ...state.filters,
             ...newFilters,
           },
-        }));
-      },
+        })),
 
-      clearFilters: () => {
-        set({ filters: initialFilters });
-      },
+      clearFilters: () => set({ filters: initialFilters }),
 
-      addToHistory: (item: Omit<SearchHistoryItem, 'timestamp'>) => {
-        const historyItem: SearchHistoryItem = {
-          ...item,
-          timestamp: Date.now(),
-        };
-
+      addToHistory: (item) =>
         set((state) => ({
-          history: [historyItem, ...state.history].slice(0, 10), // Keep last 10 searches
-        }));
-      },
+          history: [item, ...state.history].slice(0, 10),
+        })),
 
-      clearHistory: () => {
-        set({ history: [] });
-      },
+      clearHistory: () => set({ history: [] }),
 
       search: async () => {
         const { query, filters } = get();
@@ -88,37 +83,41 @@ export const useSearchStore = create<SearchState>()(
 
         try {
           // TODO: Replace with actual API call
-          // Simulating API call
-          await new Promise(resolve => setTimeout(resolve, 1000));
-          
-          // Add to history if query is not empty
-          if (query.trim()) {
-            get().addToHistory({ query, filters });
-          }
+          await new Promise((resolve) => setTimeout(resolve, 1000));
 
-          // Simulate results
+          // Simulated API response
           const results = [
             {
               id: '1',
               title: 'Sample Case 1',
-              summary: 'This is a sample case',
-              date: '2024-03-20',
+              summary: 'This is a sample case summary.',
+              date: new Date().toISOString(),
+              court: 'Supreme Court',
+              jurisdiction: 'Federal',
+              categories: ['Civil', 'Contract'],
             },
             {
               id: '2',
               title: 'Sample Case 2',
-              summary: 'Another sample case',
-              date: '2024-03-19',
+              summary: 'Another sample case summary.',
+              date: new Date().toISOString(),
+              court: 'Appellate Court',
+              jurisdiction: 'State',
+              categories: ['Criminal', 'Constitutional'],
             },
           ];
 
-          set({
-            results,
-            isLoading: false,
+          set({ results, isLoading: false });
+
+          // Add to history
+          get().addToHistory({
+            query,
+            filters,
+            timestamp: new Date(),
           });
         } catch (error) {
           set({
-            error: error instanceof Error ? error.message : 'Failed to search',
+            error: 'Failed to fetch search results',
             isLoading: false,
           });
         }
