@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -6,6 +5,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
+import { useAuthStore } from "@/store/auth";
 
 const Signup = () => {
   const [email, setEmail] = useState("");
@@ -13,9 +13,9 @@ const Signup = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { signup, isLoading, error, clearError } = useAuthStore();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -29,17 +29,22 @@ const Signup = () => {
       return;
     }
 
-    setIsLoading(true);
-
-    // Simulate signup
-    setTimeout(() => {
+    clearError();
+    
+    try {
+      await signup(email, password, firstName, lastName);
       toast({
         title: "Account created successfully!",
         description: "Welcome to Verdicto. You can now start exploring cases.",
       });
-      setIsLoading(false);
       navigate("/");
-    }, 1000);
+    } catch (err) {
+      toast({
+        title: "Signup failed",
+        description: error || "Please try again later.",
+        variant: "destructive",
+      });
+    }
   };
 
   return (

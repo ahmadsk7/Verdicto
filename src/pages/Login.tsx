@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -6,27 +5,33 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
+import { useAuthStore } from "@/store/auth";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { login, isLoading, error, clearError } = useAuthStore();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
-
-    // Simulate login
-    setTimeout(() => {
+    clearError();
+    
+    try {
+      await login(email, password);
       toast({
         title: "Login successful!",
         description: "Welcome back to Verdicto.",
       });
-      setIsLoading(false);
       navigate("/");
-    }, 1000);
+    } catch (err) {
+      toast({
+        title: "Login failed",
+        description: error || "Please check your credentials and try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   return (
