@@ -3,6 +3,7 @@ import { format } from "date-fns";
 import { Clock, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { Link } from "react-router-dom";
 
 const SearchResults = () => {
   const { results, history, isLoading, query, setQuery, setFilters } = useSearchStore();
@@ -64,16 +65,17 @@ const SearchResults = () => {
     <div className="mt-8">
       <div className="space-y-4">
         {results.map((result) => (
-          <div
+          <Link
             key={result.id}
-            className="p-4 rounded-lg border border-gray-200 hover:border-blue-200 hover:shadow-sm transition-colors"
+            to={`/case/${result.id}`}
+            className="block p-4 rounded-lg border border-gray-200 hover:border-blue-200 hover:shadow-sm transition-colors"
           >
             <h3 className="text-lg font-medium text-gray-900">{result.title}</h3>
             <p className="mt-1 text-gray-500">{result.summary}</p>
             <div className="mt-2 flex items-center gap-2 text-sm text-gray-500">
               <span>{format(new Date(result.date), 'MMM d, yyyy')}</span>
             </div>
-          </div>
+          </Link>
         ))}
       </div>
     </div>
